@@ -115,6 +115,18 @@ How HyperSpec Works
 3. _HyperSpec_ finally clusters each spectra bucket using DBSCAN algorithm. Thanks HD computing's lightweight computation and powerful data presentation capability, _HyperSpec_ achieves significant speedup over other spectra clustering tools. Most of spectra datasets can be clustered within a few minutes.
 
 
+Cython
+------------------------------------------------------
+This fork of HyperSpec uses Cython to achieve a speedup in the preprocessing stage.
+
+|datatset   |size   |preprocess runtime (python)   |preprocess runtime (cython)   |speedup|
+|-----------|-------|------------------------------|------------------------------|-------|
+|PXD001468  |5.964GB|16.9501s           |5.7282s            |2.9591 |
+|PXD001197  |26.686GB|30.3326s          |16.9501s           |1.7895 |
+
+Note: runtimes for the preprocess stage vary slightly, but not by a significant amount
+
+
 Publication
 ------------------------------------------------------
 1. Xu, Weihong, Jaeyoung Kang, Wout Bittremieux, Niema Moshiri, and Tajana Rosing. "HyperSpec: Ultrafast Mass Spectra Clustering in Hyperdimensional Space." [Journal of Proteome Research (2023)](https://pubs.acs.org/doi/full/10.1021/acs.jproteome.2c00612).
