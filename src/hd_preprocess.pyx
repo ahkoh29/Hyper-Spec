@@ -15,8 +15,69 @@ from utils import load_mgf_file, export_mgf_file
 
 cimport cython
 
+def load_checkpoint(
+    config: Config,
+    logger: logging
+    ):
+    """
+    Restore from previously saved checkpoint files (spectra meta and encoded hvs)
+    Parameters
+    ----------
+    config : 
+        Config that defines runtime parameters
+    Returns
+    -------
+    spectra_meta_df : 
+        Restored spectra meta dataframe
+    spectra_hvs : 
+        Restored spectra hvs array
+    """
+    ckp_parquet_file = config.checkpoint + '_meta.ckp'
+    ckp_hvs_file = config.checkpoint + '_hvs.ckp'
+    
+    spectra_meta_df = pd.read_parquet(ckp_parquet_file) \
+        if os.path.exists(ckp_parquet_file) else None
+    
+    spectra_hvs = None
+    if os.path.exists(ckp_hvs_file):
+        with open(ckp_hvs_file, 'rb') as f:
+            spectra_hvs = np.load(f)
+ 
+    if (spectra_meta_df is not None) and (spectra_hvs is not None):
+        logger.info("Successfully restored checkpoints from {} and {}!".format(ckp_parquet_file, ckp_hvs_file))
+    else:
+        logger.info("Incomplete checkpoints!")
 
-def export_cluster_results(
+    return spectra_meta_df, spectra_hvs
+
+
+def save_checkpoint(
+    spectra_meta: pd.DataFrame,
+    spectra_hvs: np.ndarray,
+    config: Config,
+    logger: logging
+    ):
+    """
+    Save checkpoint files (spectra meta and encoded hvs)
+    Parameters
+    ----------
+    spectra_meta_df : 
+        Spectra meta dataframe
+    spectra_hvs : 
+        Spectra hvs array
+    config : 
+        Config that defines runtime parameters
+    """
+    ckp_parquet_file = config.checkpoint + '_meta' + '.ckp'
+    ckp_hvs_file = config.checkpoint + '_hvs' + '.ckp'
+
+    spectra_meta.to_parquet(ckp_parquet_file, compression='snappy', index=False)
+    with open(ckp_hvs_file, 'wb') as f:
+        np.save(f, spectra_hvs)
+ 
+    logger.info("Save spectra metadata to: {} and encoded spectra to: {}".format(ckp_parquet_file, ckp_hvs_file))
+
+cdef export_cluster_results(
     spectra_df: pd.DataFrame,
     config: Config,
     logger: logging
@@ -57,7 +118,7 @@ def export_cluster_results(
         # Export representative spectra to MGF
         export_mgf_file(spectra_df.values.tolist(), representative_mgf_filename)
 
-def sort_spectra_meta_data(
+cdef sort_spectra_meta_data(
     spectra_meta_df: pd.DataFrame,
     spectra_mz: np.ndarray,
     spectra_intensity: np.ndarray

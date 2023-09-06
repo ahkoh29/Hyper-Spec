@@ -118,13 +118,15 @@ How HyperSpec Works
 Cython
 ------------------------------------------------------
 This fork of HyperSpec uses Cython to achieve a speedup in the preprocessing stage.
+Significant speedup was achieved in the Cython version by optimizing the code that interacts with NumPy. A combination of using the cimport of NumPy, adding type definitions, and disabling bounds checking allowed the preprocessing stage to run faster than the pure Python code. The amount of speedup observed depends on the size of the dataset.
 
 |datatset   |size   |preprocess runtime (python)   |preprocess runtime (cython)   |speedup|
 |-----------|-------|------------------------------|------------------------------|-------|
 |PXD001468  |5.964GB|16.9501s           |5.7282s            |2.9591 |
 |PXD001197  |26.686GB|30.3326s          |16.9501s           |1.7895 |
+|PXD001511  |92.618GB|93.1586s          |48.2814s           |1.9295 |
 
-Note: runtimes for the preprocess stage vary slightly, but not by a significant amount
+Note: runtimes for the preprocess stage can vary slightly between runs, but not by a notable amount
 
 
 Publication
